@@ -1,0 +1,51 @@
+FROM ubuntu:18.04
+
+RUN apt-get update \
+  && apt-get install -y python3-pip python3.7-dev \
+  && cd /usr/local/bin \
+  && ln -s /usr/bin/python3.7 python3.7 \
+  && pip3 install --upgrade pip 
+RUN  GDAL_CONFIG=/usr/bin/gdal-config
+
+
+# RUN conda install -c conda-forge postgis && \
+#     conda install -c conda-forge/label/cf201901 postgis
+# RUN apt-get update && apt-get install postgis
+
+# RUN  raster2pgsql
+#   && apt-get install language-pack-en
+
+# ENTRYPOINT ["python3"]
+
+# # pull official base imagels
+
+# # set work directory
+WORKDIR /usr/src/app
+
+# # set environment variables
+# # ENV PYTHONDONTWRITEBYTECODE 1
+# # ENV PYTHONUNBUFFERED 1
+# RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
+
+# install dependencies
+# RUN LC_ALL=C.UTF-8
+# RUN export LANG=C.UTF-8
+
+
+
+RUN locale -a
+ENV LC_ALL="C.UTF-8"
+ENV LANG="C.UTF-8"
+RUN echo $LC_ALL
+RUN echo $LANG
+RUN locale -a
+RUN python3.7 -c 'print(u"\u2122");'
+
+
+RUN pip install --upgrade pip
+COPY ./requirements.txt /usr/src/app/requirements.txt
+RUN export LDFLAGS="-L/usr/local/opt/openssl/lib"
+RUN python3.7 -m pip install -r requirements.txt
+RUN python raster2pgsql.py
+# copy project
+COPY . /usr/src/app/

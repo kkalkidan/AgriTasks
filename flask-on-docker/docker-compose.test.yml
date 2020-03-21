@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  web:
+    build: ./services/web
+    command: python3.6 manage.py run -h 0.0.0.0
+    volumes:
+      - ./services/web/:/usr/src/app/
+    ports:
+      - 5000:5000
+    env_file:
+      - ./.env.test
+    depends_on:
+      - db
+  sut:
+    build:
+      context: ./services/web
+      dockerfile: /Users/kalkidanfekadu/tutorial/FromScratch/flask-on-docker/services/web/test/Dockerfile
+    command: pytest test/test_api.py
+    depends_on:
+      - web
+      - db
+  db:
+    image: postgis/postgis:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+
+volumes:
+  postgres_data:
